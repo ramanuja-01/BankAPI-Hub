@@ -17,6 +17,7 @@ const GLOBAL_STATE = {
   activeDetailTab: 'overview',
   activeCodeLang: 'curl',
   activeDashboardTab: 'analytics',
+  activeUseCaseTab: 'neo-bank',
   theme: 'light'
 };
 
@@ -410,6 +411,18 @@ function setDashboardTab(tab) {
   GLOBAL_STATE.activeDashboardTab = tab;
   if (GLOBAL_STATE.currentView === 'dashboard') {
     renderCurrentView('dashboard');
+  }
+}
+
+// Homepage Use Case Tabs toggles
+function selectUseCaseTab(tab) {
+  GLOBAL_STATE.activeUseCaseTab = tab;
+  if (GLOBAL_STATE.currentView === 'home') {
+    renderCurrentView('home');
+    const elem = document.getElementById('recommended-use-cases-section');
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+    }
   }
 }
 

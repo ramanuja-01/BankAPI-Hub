@@ -23,6 +23,70 @@ function renderHomeView() {
     </div>
   `).join('');
 
+  const activeTab = GLOBAL_STATE.activeUseCaseTab || 'neo-bank';
+  let blueprintApis = [];
+  let flowTitle = '';
+  let steps = [];
+
+  if (activeTab === 'neo-bank') {
+    blueprintApis = ['plaid-auth-link', 'unit-core-ledger', 'marqeta-core-cards'];
+    flowTitle = 'Pre-Vetted FDIC Checking Account & Card Stack';
+    steps = [
+      { num: 1, title: 'Auth & Connect', desc: 'Connect customer bank accounts via Plaid to verify external bank details and handle ACH transfers.' },
+      { num: 2, title: 'Ledger & Checking', desc: 'Create dual-entry ledger and issue virtual checking accounts with routing numbers using Unit.' },
+      { num: 3, title: 'Card Issuing', desc: 'Issue debit cards linked to checking account balances with custom spending rules via Marqeta.' }
+    ];
+  } else if (activeTab === 'startup-onboarding') {
+    blueprintApis = ['persona-verify-kyc', 'alloy-decisioning-compliance', 'lithic-card-api'];
+    flowTitle = 'Automated Identity & Risk Screening Stack';
+    steps = [
+      { num: 1, title: 'Verify Identity', desc: 'Collect and run OCR checks on government documents and face biometric selfies via Persona.' },
+      { num: 2, title: 'Risk Orchestration', desc: 'Assess data inputs, screen watchlists, and run custom credit/risk decisions via Alloy.' },
+      { num: 3, title: 'Issue Card', desc: 'Instantly issue virtual corporate cards for business payments via Lithic.' }
+    ];
+  } else if (activeTab === 'sme-banking') {
+    blueprintApis = ['stripe-payments-card', 'unit-core-ledger', 'modern-treasury-reconciliation'];
+    flowTitle = 'B2B Card Acquiring & Reconciliation Ledger';
+    steps = [
+      { num: 1, title: 'Process Payments', desc: 'Capture and charge credit cards, wallets, and ACH transfers globally via Stripe Payments.' },
+      { num: 2, title: 'FDIC Deposits', desc: 'Maintain FDIC accounts, ledgers, and savings products for enterprise clients via Unit.' },
+      { num: 3, title: 'Automate Payouts', desc: 'Reconcile payment ledger transactions and push ACH/wires to clearing banks via Modern Treasury.' }
+    ];
+  } else if (activeTab === 'payouts') {
+    blueprintApis = ['plaid-auth-link', 'modern-treasury-reconciliation', 'lithic-card-api'];
+    flowTitle = 'High-Volume Direct ACH & Card Payout System';
+    steps = [
+      { num: 1, title: 'Link Bank Info', desc: 'Verify external bank accounts instantly and retrieve routing info via Plaid.' },
+      { num: 2, title: 'Orchestrate Payouts', desc: 'Initiate ACH/wires and automatically reconcile clearing statement lines via Modern Treasury.' },
+      { num: 3, title: 'Disburse Funds', desc: 'Issue instant-payout cards or push real-time payments programmatically via Lithic.' }
+    ];
+  }
+
+  const apisList = getAllAPIs();
+  const selectedApis = blueprintApis.map(id => apisList.find(a => a.id === id)).filter(Boolean);
+  
+  const blueprintCardsHtml = selectedApis.map(api => {
+    const isSelected = GLOBAL_STATE.compareList.some(item => item.id === api.id);
+    return renderApiCard(api, isSelected, 'toggleCompareSelection');
+  }).join('');
+  
+  const stepsHtml = steps.map((step, idx) => `
+    <div class="blueprint-step-node">
+      <div style="display:flex; justify-content:center; margin-bottom:8px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background-color:var(--primary-color); color:#fff; font-size:0.85rem; font-weight:700;">${step.num}</span>
+      </div>
+      <h4>${step.title}</h4>
+      <p>${step.desc}</p>
+    </div>
+    ${idx < steps.length - 1 ? `
+      <div class="blueprint-flow-arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:24px; height:24px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      </div>
+    ` : ''}
+  `).join('');
+
   return `
     <section class="hero-section">
       <div class="hero-container">
@@ -125,6 +189,53 @@ function renderHomeView() {
       </div>
       <div class="category-grid">
         ${catCards}
+      </div>
+    </section>
+
+    <section id="recommended-use-cases-section" class="section" style="border-top: 1px solid var(--border-color); background-color: var(--bg-primary); padding-top: 60px; padding-bottom: 60px;">
+      <div class="section-headline" style="text-align: center; max-width: 760px; margin: 0 auto 40px auto;">
+        <span class="section-tag">Integration Blueprints</span>
+        <h2 class="section-title">Verified Architecture Stacks</h2>
+        <p class="section-subtitle">Accelerate development with pre-vetted API combinations tailored for common financial service architectures and products.</p>
+      </div>
+
+      <div class="use-case-tabs-container">
+        <div class="use-case-tabs">
+          <button class="use-case-tab-btn ${activeTab === 'neo-bank' ? 'active' : ''}" onclick="selectUseCaseTab('neo-bank')">
+            <svg class="tab-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+            <span>Neo-Bank Launch</span>
+          </button>
+          <button class="use-case-tab-btn ${activeTab === 'startup-onboarding' ? 'active' : ''}" onclick="selectUseCaseTab('startup-onboarding')">
+            <svg class="tab-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+            <span>Startup Onboarding</span>
+          </button>
+          <button class="use-case-tab-btn ${activeTab === 'sme-banking' ? 'active' : ''}" onclick="selectUseCaseTab('sme-banking')">
+            <svg class="tab-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"/><path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0010 15c-2.796 0-5.487-.46-8-1.308z"/></svg>
+            <span>SME Banking Stack</span>
+          </button>
+          <button class="use-case-tab-btn ${activeTab === 'payouts' ? 'active' : ''}" onclick="selectUseCaseTab('payouts')">
+            <svg class="tab-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.554-.589 1.448-.589 2.002 0l3.586 3.818c.59.628.143 1.664-.722 1.664h-1.312v4.364c0 .41-.334.746-.746.746H8.841a.746.746 0 01-.746-.746V12.9H6.783c-.865 0-1.313-1.036-.722-1.664l3.586-3.818z"/><path d="M10.87 2.057a.75.75 0 00-.74 0L2.38 6.495A.75.75 0 002.75 7.8h14.5a.75.75 0 00.37-1.305L10.87 2.057z"/></svg>
+            <span>Instant Payouts Flow</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="blueprint-container">
+        <div class="blueprint-flow-wrapper">
+          <div class="blueprint-flow-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:20px; height:20px; color:var(--primary-color);">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+            </svg>
+            ${flowTitle}
+          </div>
+          <div class="blueprint-flow-steps">
+            ${stepsHtml}
+          </div>
+        </div>
+        
+        <div class="blueprint-cards-grid">
+          ${blueprintCardsHtml}
+        </div>
       </div>
     </section>
 

@@ -2214,6 +2214,143 @@ input, select, textarea, button {
   }
 }
 
+/* Blueprints Section Styles */
+.use-case-tabs-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1px;
+}
+
+.use-case-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.use-case-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.use-case-tab-btn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.use-case-tab-btn.active {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.use-case-tab-btn .tab-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Blueprint Architecture Visual Flow */
+.blueprint-container {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: var(--card-shadow);
+  margin-top: 24px;
+}
+
+.blueprint-flow-wrapper {
+  margin-bottom: 40px;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.blueprint-flow-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blueprint-flow-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  gap: 20px;
+}
+
+.blueprint-step-node {
+  flex: 1;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.blueprint-step-node h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--primary-color);
+}
+
+.blueprint-step-node p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.blueprint-flow-arrow {
+  display: flex;
+  align-items: center;
+  color: var(--primary-color);
+  opacity: 0.6;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.blueprint-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 992px) {
+  .blueprint-flow-steps {
+    flex-direction: column;
+  }
+  .blueprint-flow-arrow {
+    transform: rotate(90deg);
+    margin: 8px 0;
+  }
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
