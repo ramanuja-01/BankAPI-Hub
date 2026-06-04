@@ -269,34 +269,24 @@ input, select, textarea, button {
   color: var(--text-primary);
 }
 
-.brand-logo img {
-  height: 32px;
-  width: 32px;
-  object-fit: contain;
-  transition: transform 0.2s ease;
+.brand-logo svg.brand-logo-svg {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-[data-theme="dark"] .brand-logo img {
-  background-color: #ffffff; /* Add white background card in dark mode so shield remains visible */
-  border-radius: 6px;
-  padding: 2px;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-}
-
-.brand-logo:hover img {
-  transform: scale(1.1);
+.brand-logo:hover svg.brand-logo-svg {
+  transform: scale(1.1) rotate(4deg);
 }
 
 .brand-logo span {
   background: linear-gradient(135deg, var(--primary-color), var(--indigo-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-.brand-logo svg {
-  width: 32px;
-  height: 32px;
-  fill: var(--primary-color);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
 
 .nav-menu {

@@ -1,4 +1,4 @@
-# <img src="assets/branding/logo.png" align="center" width="40" height="40" style="border-radius:8px;"> BankAPI Hub - B2B Fintech API Marketplace
+# <img src="assets/branding/logo.svg" align="center" width="44" height="44"> BankAPI Hub - B2B Fintech API Marketplace
 
 BankAPI Hub is a curated B2B marketplace for embedded-finance and banking infrastructure APIs. It allows fintech buyers (startups, banks, NBFCs, SaaS applications) to search, filter, compare, and request sandboxed access for KYC, payments, ledger, reconciliation, cards, and fraud endpoints. Vendors can list their APIs, upgrade subscription tiers, and audit captured leads via an interactive dashboard.
 
