@@ -269,6 +269,32 @@ input, select, textarea, button {
   color: var(--text-primary);
 }
 
+.brand-logo img {
+  height: 38px;
+  width: 38px;
+  object-fit: contain;
+  background-color: #ffffff; /* Unified white background for the logo shield card */
+  border-radius: 8px;
+  padding: 3px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+[data-theme="dark"] .brand-logo img {
+  border-color: #1e293b;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+}
+
+.brand-logo:hover img {
+  transform: scale(1.06) translateY(-1px);
+  box-shadow: 0 6px 12px -2px rgba(15, 23, 42, 0.12), 0 3px 6px -2px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="dark"] .brand-logo:hover img {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15), 0 12px 20px -4px rgba(0, 0, 0, 0.6);
+}
+
 .brand-logo span {
   background: linear-gradient(135deg, var(--primary-color), var(--indigo-color));
   -webkit-background-clip: text;
