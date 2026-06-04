@@ -655,9 +655,9 @@ function showSuccessModal(title, messageHtml) {
 }
 
 // Terminal mock dynamic writing animation
-let terminalInterval;
+let terminalTimeout;
 function startTerminalAnimation() {
-  clearInterval(terminalInterval);
+  clearTimeout(terminalTimeout);
   const terminal = document.getElementById('home-terminal-content');
   if (!terminal) return;
 
@@ -678,7 +678,7 @@ function startTerminalAnimation() {
 
   function typeChar() {
     if (lineIdx >= lines.length) {
-      clearInterval(terminalInterval);
+      clearTimeout(terminalTimeout);
       return;
     }
 
@@ -699,7 +699,7 @@ function startTerminalAnimation() {
         terminal.scrollTop = terminal.scrollHeight;
         lineIdx++;
         charIdx = 0;
-        setTimeout(typeChar, 800);
+        terminalTimeout = setTimeout(typeChar, 800);
         return;
       }
       terminal.appendChild(currentDiv);
@@ -712,9 +712,9 @@ function startTerminalAnimation() {
     if (charIdx >= currentLine.text.length) {
       lineIdx++;
       charIdx = 0;
-      setTimeout(typeChar, 400);
+      terminalTimeout = setTimeout(typeChar, 400);
     } else {
-      setTimeout(typeChar, 25 + Math.random() * 20);
+      terminalTimeout = setTimeout(typeChar, 25 + Math.random() * 20);
     }
   }
 
