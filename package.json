@@ -1,0 +1,19 @@
+{
+  "name": "bankapi-hub",
+  "version": "1.0.0",
+  "description": "Pre-vetting B2B API Marketplace for Banking & Fintech Infrastructure",
+  "main": "index.html",
+  "scripts": {
+    "start": "node scripts/server.js",
+    "dev": "node scripts/server.js"
+  },
+  "keywords": [
+    "fintech",
+    "banking",
+    "api",
+    "marketplace",
+    "baas"
+  ],
+  "author": "BankAPI Hub Team",
+  "license": "MIT"
+}
