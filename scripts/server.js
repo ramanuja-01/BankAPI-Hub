@@ -622,9 +622,17 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Static File Server Routing
+  const workspaceRoot = path.resolve(__dirname, '..');
   let filePath = req.url === '/' ? '/index.html' : req.url;
   const cleanPath = filePath.split('?')[0].split('#')[0];
-  const absolutePath = path.join(path.resolve(__dirname, '..'), cleanPath);
+  const absolutePath = path.resolve(workspaceRoot, '.' + cleanPath);
+
+  // Security check: prevent directory traversal
+  if (!absolutePath.startsWith(workspaceRoot)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain' });
+    res.end('403 Forbidden: Access denied.', 'utf-8');
+    return;
+  }
 
   fs.readFile(absolutePath, (err, content) => {
     if (err) {
