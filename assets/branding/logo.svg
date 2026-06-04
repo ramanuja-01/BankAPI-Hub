@@ -1,42 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" class="brand-logo-svg">
-  <!-- Hexagon shield frame with gradients -->
-  <path d="M50 6L90 29v46L50 94L10 75V29L50 6Z" stroke="url(#logo-grad)" stroke-width="7" stroke-linejoin="round" fill="none"/>
+  <!-- Shield Frame -->
+  <path d="M50 12 L85 27 V58 C85 76, 70 88, 50 92 C30 88, 15 76, 15 58 V27 L50 12 Z" stroke="url(#logo-grad)" stroke-width="8" stroke-linejoin="round" fill="none" />
   
-  <!-- Bank Pediment (Roof) -->
-  <path d="M30 38 L50 22 L70 38" stroke="#0f172a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" class="theme-stroke"/>
+  <!-- Crossed connection lines (API Integration) -->
+  <path d="M33 38 L67 72" stroke="#0284c7" stroke-width="8" stroke-linecap="round" />
+  <path d="M67 38 L33 72" stroke="#0d9488" stroke-width="8" stroke-linecap="round" />
   
-  <!-- Architrave -->
-  <path d="M26 42 H74" stroke="#0f172a" stroke-width="6" stroke-linecap="round" class="theme-stroke"/>
+  <!-- Central connection hub node -->
+  <circle cx="50" cy="55" r="7" fill="#ffffff" stroke="#4f46e5" stroke-width="4" class="theme-fill" />
   
-  <!-- Pillars represented by vertical API brackets -->
-  <path d="M34 48 C30 52 30 58 34 62" stroke="#0f172a" stroke-width="4" stroke-linecap="round" class="theme-stroke"/>
-  <path d="M42 48 V62" stroke="#0f172a" stroke-width="4" stroke-linecap="round" class="theme-stroke"/>
-  <path d="M58 48 V62" stroke="#0f172a" stroke-width="4" stroke-linecap="round" class="theme-stroke"/>
-  <path d="M66 48 C70 52 70 58 66 62" stroke="#0f172a" stroke-width="4" stroke-linecap="round" class="theme-stroke"/>
-  
-  <!-- Bank Foundation -->
-  <path d="M26 68 H74" stroke="#0f172a" stroke-width="6" stroke-linecap="round" class="theme-stroke"/>
-  
-  <!-- API Node connection right in the center -->
-  <circle cx="50" cy="55" r="8" fill="#0d9488"/>
-  <circle cx="50" cy="55" r="4" fill="#ffffff"/>
-  <line x1="50" y1="55" x2="22" y2="55" stroke="#0d9488" stroke-width="4" stroke-dasharray="2 3"/>
-  <line x1="50" y1="55" x2="78" y2="55" stroke="#0d9488" stroke-width="4" stroke-dasharray="2 3"/>
-  <circle cx="22" cy="55" r="5" fill="#0284c7"/>
-  <circle cx="78" cy="55" r="5" fill="#0284c7"/>
-  
-  <!-- Definitions for gradients -->
   <defs>
-    <linearGradient id="logo-grad" x1="10" y1="6" x2="90" y2="94">
+    <linearGradient id="logo-grad" x1="15" y1="12" x2="85" y2="92">
       <stop offset="0%" stop-color="#0284c7" />
       <stop offset="100%" stop-color="#4f46e5" />
     </linearGradient>
   </defs>
   
   <style>
-    /* Dark/Light adaptability when loaded as an image file */
     @media (prefers-color-scheme: dark) {
-      .theme-stroke { stroke: #f8fafc !important; }
+      .theme-fill { fill: #090d16 !important; }
     }
   </style>
 </svg>
