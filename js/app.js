@@ -1,4 +1,4 @@
-// BankAPI Hub - Core App Controller & State Manager
+// BankAPI Hub - Core App Controller & State Manager (Full-Stack Integrated)
 
 // Global State
 const GLOBAL_STATE = {
@@ -20,11 +20,25 @@ const GLOBAL_STATE = {
   theme: 'light'
 };
 
-// Main Initialization
-document.addEventListener('DOMContentLoaded', () => {
+// Main Initialization (Asynchronous Data Sync)
+document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   initRouter();
   initModalListeners();
+  
+  // Show connection loading spinner
+  const viewport = document.getElementById('main-content-viewport');
+  if (viewport) {
+    viewport.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:16px;">
+        <div style="animation: spin 0.8s linear infinite; border: 4px solid var(--border-color); border-top-color: var(--primary-color); width: 40px; height: 40px; border-radius: 50%;"></div>
+        <p style="color:var(--text-secondary); font-size:0.95rem; font-weight:600;">Synchronizing secure ledger database...</p>
+      </div>
+    `;
+  }
+  
+  // Wait for REST API connection sync
+  await initFullStackData();
   
   // Custom navigation styling sync
   window.addEventListener('hashchange', handleRouteChange);
@@ -51,13 +65,7 @@ function initTheme() {
 }
 
 function toggleTheme() {
-  GLOBAL_STATE.theme = GLOBAL_STATE.theme === 'light' ? 'dark' : 'dark'; // Toggle
-  if (document.documentElement.getAttribute('data-theme') === 'light') {
-    GLOBAL_STATE.theme = 'dark';
-  } else {
-    GLOBAL_STATE.theme = 'light';
-  }
-  
+  GLOBAL_STATE.theme = GLOBAL_STATE.theme === 'light' ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', GLOBAL_STATE.theme);
   localStorage.setItem('bankapi_hub_theme', GLOBAL_STATE.theme);
   updateThemeIcon();
@@ -86,13 +94,12 @@ function updateThemeIcon() {
 
 // Client Side Hash Router
 function initRouter() {
-  // Navigation active state styling
   updateActiveNavLinks();
 }
 
 function handleRouteChange() {
   const hash = window.location.hash || '#home';
-  GLOBAL_STATE.compareList = getCompareListFromSession(); // Keep compare list active
+  GLOBAL_STATE.compareList = getCompareListFromSession();
   
   let route = 'home';
   let parameter = null;
@@ -104,20 +111,16 @@ function handleRouteChange() {
     route = 'vendor';
     parameter = hash.substring('#vendor/'.length);
   } else {
-    route = hash.substring(1); // strip the #
+    route = hash.substring(1);
   }
 
   GLOBAL_STATE.currentView = route;
   updateActiveNavLinks();
   renderCurrentView(route, parameter);
   
-  // Close any overlay
   closeAllModals();
-  
-  // Scroll to top
   window.scrollTo(0, 0);
 
-  // If home route, trigger terminal typing effect
   if (route === 'home') {
     startTerminalAnimation();
   }
@@ -178,7 +181,7 @@ function renderCurrentView(route, parameter) {
   }
 }
 
-// Comparison State Management (uses SessionStorage for browser refresh tolerance)
+// Comparison State Management
 function getCompareListFromSession() {
   const data = sessionStorage.getItem('bankapi_hub_compare');
   return data ? JSON.parse(data) : [];
@@ -197,7 +200,6 @@ function toggleCompareSelection(apiId, isSelected) {
   if (isSelected) {
     if (list.length >= 3) {
       alert('You can compare a maximum of 3 APIs simultaneously.');
-      // Uncheck checkbox
       const checkbox = document.querySelector(`#api-card-${apiId} input[type="checkbox"]`);
       if (checkbox) checkbox.checked = false;
       return;
@@ -236,7 +238,6 @@ function clearComparison() {
   GLOBAL_STATE.compareList = [];
   saveCompareListToSession([]);
   
-  // Uncheck all checkboxes if on browse page
   const checkboxes = document.querySelectorAll('.api-card input[type="checkbox"]');
   checkboxes.forEach(c => c.checked = false);
   
@@ -271,8 +272,6 @@ function debounceFilterListings() {
   clearTimeout(filterDebounceTimer);
   filterDebounceTimer = setTimeout(() => {
     if (GLOBAL_STATE.currentView === 'browse') {
-      const viewport = document.getElementById('main-content-viewport');
-      // Re-render only browse listings grid/header area to prevent full DOM flashing
       renderCurrentView('browse');
       updateCompareDrawerUI();
     }
@@ -333,7 +332,6 @@ function getFilteredAPIs() {
   const search = GLOBAL_STATE.searchQuery.toLowerCase().trim();
   const filters = GLOBAL_STATE.activeFilters;
 
-  // Search filter
   if (search) {
     apis = apis.filter(api => {
       const v = MOCK_VENDORS[api.vendorId] || { name: '' };
@@ -345,52 +343,43 @@ function getFilteredAPIs() {
     });
   }
 
-  // Category filter
   if (filters.category) {
     apis = apis.filter(api => api.category === filters.category);
   }
 
-  // Region filter
   if (filters.regions.length > 0) {
     apis = apis.filter(api => 
       api.regions.some(r => filters.regions.includes(r))
     );
   }
 
-  // Pricing model filter
   if (filters.pricingModel.length > 0) {
     apis = apis.filter(api => filters.pricingModel.includes(api.pricingModel));
   }
 
-  // Compliance filter
   if (filters.compliance.length > 0) {
     apis = apis.filter(api => 
       filters.compliance.every(c => api.complianceTags.includes(c))
     );
   }
 
-  // Sandbox Only
   if (filters.sandboxOnly) {
     apis = apis.filter(api => api.sandbox === true);
   }
 
-  // Webhooks Only
   if (filters.webhooksOnly) {
     apis = apis.filter(api => api.webhooks === true);
   }
 
-  // Sorting
   apis.sort((a, b) => {
     if (GLOBAL_STATE.sortBy === 'latency') {
-      return a.latency - b.latency; // lowest first
+      return a.latency - b.latency;
     }
     if (GLOBAL_STATE.sortBy === 'uptime') {
-      // highest first e.g. "99.99%" -> 99.99
       const uptA = parseFloat(a.uptime.replace('%', ''));
       const uptB = parseFloat(b.uptime.replace('%', ''));
       return uptB - uptA;
     }
-    // Default popularity: mock index ordering
     return 0; 
   });
 
@@ -425,15 +414,15 @@ function setDashboardTab(tab) {
 }
 
 // Dashboard Status lead updates
-function changeLeadStatus(leadId, status) {
-  updateLeadStatus(leadId, status);
-  if (GLOBAL_STATE.currentView === 'dashboard') {
+async function changeLeadStatus(leadId, status) {
+  const success = await updateLeadStatus(leadId, status);
+  if (success && GLOBAL_STATE.currentView === 'dashboard') {
     renderCurrentView('dashboard');
   }
 }
 
 // API Submission Handler (Vendor Form)
-function handleApiSubmission(event) {
+async function handleApiSubmission(event) {
   event.preventDefault();
   
   const name = document.getElementById('sub-name').value;
@@ -443,32 +432,25 @@ function handleApiSubmission(event) {
   const pricingModel = document.getElementById('sub-pricing-model').value;
   const pricingDetails = document.getElementById('sub-pricing-details').value;
   
-  // Get checked regions
   const regionCheckboxes = document.getElementsByName('sub-regions');
   const regions = [];
-  regionCheckboxes.forEach(cb => {
-    if (cb.checked) regions.push(cb.value);
-  });
+  regionCheckboxes.forEach(cb => { if (cb.checked) regions.push(cb.value); });
   
-  // Get checked compliance
   const complianceCheckboxes = document.getElementsByName('sub-compliance');
   const complianceTags = [];
-  complianceCheckboxes.forEach(cb => {
-    if (cb.checked) complianceTags.push(cb.value);
-  });
+  complianceCheckboxes.forEach(cb => { if (cb.checked) complianceTags.push(cb.value); });
 
   const sandbox = document.getElementById('sub-sandbox').value === 'true';
   const webhooks = document.getElementById('sub-webhooks').value === 'true';
   const latency = parseInt(document.getElementById('sub-latency').value);
   const uptime = document.getElementById('sub-uptime').value;
 
-  // Build simulated listing
   const apiId = name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-api';
   
   const newApi = {
     id: apiId,
     name,
-    vendorId: 'stripe-pay', // mock vendor identity
+    vendorId: 'stripe-pay',
     category,
     slogan,
     description,
@@ -489,38 +471,30 @@ function handleApiSubmission(event) {
     openapiSchema: {
       "openapi": "3.0.0",
       "info": { "title": name, "version": "1.0.0" },
-      "paths": {
-        "/v1/test": {
-          "get": { "summary": "Verify interface connectivity" }
-        }
-      }
+      "paths": { "/v1/test": { "get": { "summary": "Verify interface connectivity" } } }
     },
     codeExample: {
-      curl: `curl https://api.stripe.com/v1/sub-api-endpoint \\
-  -u sk_test_key_xyz:`,
-      javascript: `const axios = require('axios');
-axios.get('https://api.stripe.com/v1/sub-api-endpoint')
-.then(res => console.log(res.data));`,
-      python: `import requests
-res = requests.get('https://api.stripe.com/v1/sub-api-endpoint')
-print(res.json())`
+      curl: `curl https://api.stripe.com/v1/sub-api-endpoint \\\n  -u sk_test_key_xyz:`,
+      javascript: `const axios = require('axios');\naxios.get('https://api.stripe.com/v1/sub-api-endpoint')\n.then(res => console.log(res.data));`,
+      python: `import requests\nres = requests.get('https://api.stripe.com/v1/sub-api-endpoint')\nprint(res.json())`
     }
   };
 
-  saveCustomAPI(newApi);
+  const success = await saveCustomAPI(newApi);
   
-  // Open submission success state modal
-  showSuccessModal(
-    'API Listing Submitted',
-    `Your API product <strong>"${name}"</strong> has been successfully processed and added to the directory. It is now instantly discoverable in the search index.`
-  );
-
-  // Clear form
-  document.getElementById('new-api-submission-form').reset();
+  if (success) {
+    showSuccessModal(
+      'API Listing Submitted',
+      `Your API product <strong>"${name}"</strong> has been successfully processed and written to the persistent database. It is now instantly discoverable in the search index.`
+    );
+    document.getElementById('new-api-submission-form').reset();
+  } else {
+    alert('Failed to submit listing. Please try again.');
+  }
 }
 
 // Lead Forms handlers
-function handleGeneralContactSubmission(event) {
+async function handleGeneralContactSubmission(event) {
   event.preventDefault();
   
   const name = document.getElementById('cnt-name').value;
@@ -544,15 +518,19 @@ function handleGeneralContactSubmission(event) {
     status: 'New'
   };
 
-  saveLead(mockLead);
+  const success = await saveLead(mockLead);
   
-  showSuccessModal(
-    'Inquiry Received',
-    `Thank you, <strong>${name}</strong>. Our marketplace procurement specialists have received your requirements for <strong>"${interest}"</strong>. We will coordinate with sponsor banking representatives and reach out to you within 24 hours.`
-  );
+  if (success) {
+    showSuccessModal(
+      'Inquiry Received',
+      `Thank you, <strong>${name}</strong>. Our marketplace procurement specialists have received your requirements for <strong>"${interest}"</strong>. We will coordinate with sponsor banking representatives and reach out to you within 24 hours.`
+    );
+  } else {
+    alert('Failed to submit inquiry. Please try again.');
+  }
 }
 
-function handleRequestDemoFormSubmit(event) {
+async function handleRequestDemoFormSubmit(event) {
   event.preventDefault();
   
   const apiId = document.getElementById('req-api-id').value;
@@ -580,19 +558,21 @@ function handleRequestDemoFormSubmit(event) {
     status: 'New'
   };
 
-  saveLead(mockLead);
+  const success = await saveLead(mockLead);
   
-  showSuccessModal(
-    'Sandbox & Demo Booked',
-    `Success! A lead notification has been dispatched to <strong>${apiName}</strong>. A sandboxed credentials package will be generated for <strong>${company}</strong> and emailed to <strong>${email}</strong>.`
-  );
+  if (success) {
+    showSuccessModal(
+      'Sandbox & Demo Booked',
+      `Success! A lead notification has been dispatched to <strong>${apiName}</strong>. A sandboxed credentials package will be generated for <strong>${company}</strong> and emailed to <strong>${email}</strong>.`
+    );
+  } else {
+    alert('Failed to submit lead. Please try again.');
+  }
 }
 
 function handleComplianceChecklistDownload(event) {
   event.preventDefault();
-  const name = document.getElementById('mag-name').value;
   const email = document.getElementById('mag-email').value;
-  const company = document.getElementById('mag-company').value;
 
   showSuccessModal(
     'Checklist Download Started',
@@ -602,7 +582,6 @@ function handleComplianceChecklistDownload(event) {
 
 // Modal dialog mechanisms
 function initModalListeners() {
-  // Click on background closes modal
   const modals = document.querySelectorAll('.modal-overlay');
   modals.forEach(modal => {
     modal.addEventListener('click', (e) => {
@@ -638,7 +617,6 @@ function openCheckoutModal(planName, price) {
 
 function handleCheckoutFormSubmit(event) {
   event.preventDefault();
-  
   const plan = document.getElementById('chk-plan-title').innerText;
   
   showSuccessModal(
@@ -705,33 +683,25 @@ function startTerminalAnimation() {
         currentDiv.className = 'terminal-output';
         currentDiv.innerHTML = `<pre style="margin:0;font-family:var(--font-mono);font-size:0.8rem;white-space:pre-wrap;color:#34d399;">${currentLine.text}</pre>`;
         terminal.appendChild(currentDiv);
-        // Autoscroll terminal if needed
         terminal.scrollTop = terminal.scrollHeight;
         lineIdx++;
         charIdx = 0;
-        // Delay before restarting typing or moving to next line
         setTimeout(typeChar, 800);
         return;
       }
       terminal.appendChild(currentDiv);
     }
 
-    if (currentLine.type === 'comment') {
-      currentDiv.textContent += currentLine.text[charIdx];
-    } else {
-      currentDiv.textContent += currentLine.text[charIdx];
-    }
-
+    currentDiv.textContent += currentLine.text[charIdx];
     charIdx++;
-    // Autoscroll terminal
     terminal.scrollTop = terminal.scrollHeight;
 
     if (charIdx >= currentLine.text.length) {
       lineIdx++;
       charIdx = 0;
-      setTimeout(typeChar, 400); // Wait between lines
+      setTimeout(typeChar, 400);
     } else {
-      setTimeout(typeChar, 25 + Math.random() * 20); // Random typing speed
+      setTimeout(typeChar, 25 + Math.random() * 20);
     }
   }
 
